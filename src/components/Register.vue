@@ -18,28 +18,6 @@
             <form>
               <v-text-field
                 class="input-field"
-                v-validate="'required: true'"
-                name="First Name"
-                label="First Name"
-                type="text"
-                v-model="newUser.firstName"></v-text-field>
-              <span
-                v-show="errors.has('First Name')"
-                class="errorMessage">{{ errors.first('First Name') }}</span>
-
-              <v-text-field
-                class="input-field"
-                v-validate="'required: true'"
-                name="Last Name"
-                label="Last Name"
-                type="text"
-                v-model="newUser.lastName"></v-text-field>
-              <span
-                v-show="errors.has('Last Name')"
-                class="errorMessage">{{ errors.first('Last Name') }}</span>
-
-              <v-text-field
-                class="input-field"
                 v-validate="'required|email'"
                 name="email"
                 label="E-mail"
@@ -56,11 +34,25 @@
                 label="Password"
                 id="password"
                 type="password"
+                ref="password"
                 v-model="newUser.pass"></v-text-field>
               <span
                 id="password-error"
                 v-show="errors.has('Password')"
                 class="errorMessage">{{ errors.first('Password') }}</span>
+
+                <v-text-field
+                  class="input-field"
+                  v-validate="'required|confirmed:password'"
+                  name="Confirm Password"
+                  label="Confirm Password"
+                  id="confirmPassword"
+                  type="password"
+                  v-model="newUser.confirmPass"></v-text-field>
+                <span
+                  id="confirm-password-error"
+                  v-show="errors.has('Confirm Password')"
+                  class="errorMessage">{{ errors.first('Confirm Password') }}</span>
             </form>
           </v-card-text>
           <v-card-actions>
@@ -68,7 +60,7 @@
             <v-btn
               color="accent"
               @click.native="register"
-              :disabled="!formIsValid">Register</v-btn>
+              :disabled="errors.any() || !formIsValid">Register</v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -99,6 +91,9 @@ export default {
     }
   },
   methods: {
+    onRegister () {
+        this.$store.dispatch('registerUser', { email: this.email, password: this.pass })
+      },
     register (e) {
       if (!this.formIsValid) {
         return
