@@ -1,10 +1,10 @@
 <template>
   <v-container class="mt-5 pt-5">
-    <v-layout row v-if="error">
+    <v-layout row v-if="storeError">
       <v-flex xs10 offset-xs1 sm6 offset-sm3 lg4 offset-lg4>
         <v-alert
           :value="true"
-          type="error">{{ error }}</v-alert>
+          type="error">{{ storeError.message }}</v-alert>
       </v-flex>
     </v-layout>
     <v-layout row>
@@ -59,8 +59,9 @@
             <v-spacer></v-spacer>
             <v-btn
               color="accent"
-              @click.native="register"
-              :disabled="errors.any() || !formIsValid">Register</v-btn>
+              @click.native="onRegister"
+              :disabled="errors.any() || !formIsValid"
+              :loading="loading">Register</v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -70,6 +71,7 @@
 
 <script>
 import axios from 'axios'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Register',
@@ -84,33 +86,31 @@ export default {
     }
   },
   computed: {
+    ...mapGetters([
+      'storeError',
+      'loading'
+    ]),
     formIsValid () {
       return this.newUser.email !== '' &&
         this.newUser.pass !== '' &&
         this.newUser.confirmPass !== ''
+    },
+    user () {
+      return this.$store.getters.userInfo
     }
   },
   methods: {
     onRegister () {
-        this.$store.dispatch('registerUser', { email: this.email, password: this.pass })
-      },
-    register (e) {
-      if (!this.formIsValid) {
-        return
+        this.$store.dispatch('registerUser', {
+          email: this.newUser.email,
+          password: this.newUser.pass
+        })
       }
-      if (this.newUser.firstName === '' || this.newUser.lastName === '' || this.newUser.email === '' || this.newUser.pass === '') {
-        this.error = true
-        e.preventDefault()
-        return false
-      } else if (this.error === false) {
-        axios
-          .post('api/v1/user', this.newUser)
-          .then(res => {
-            this.$router.push({ name: 'login' })
-          })
-          .catch(err => {
-            this.error = err.data
-          })
+  },
+  watch: {
+    'user' (value) {
+      if (value !== null && value !== undefined) {
+        this.$router.push({ name: 'login' })
       }
     }
   }

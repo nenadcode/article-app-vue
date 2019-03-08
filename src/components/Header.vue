@@ -80,7 +80,6 @@ export default {
       'resetUserInfo'
     ]),
     logout () {
-      localStorage.removeItem('advis-token')
       this.resetUserInfo()
       this.$router.push({ name: 'login' })
     }
@@ -90,7 +89,8 @@ export default {
       'userInfo'
     ]),
     loggedIn () {
-      return !!this.token
+      return this.$store.getters.userInfo !== null &&   this.$store.getters.userInfo !== undefined &&
+      this.$store.getters.userInfo.id !== undefined
     },
     menuItems () {
       let menuItems = [

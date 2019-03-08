@@ -1,6 +1,7 @@
 import articlesApi from '../../../api/articles'
 import commentsApi from '../../../api/comments'
 import * as types from './mutation-types'
+import * as alert from '../alert/mutation-types'
 
 const state = {
   articles: null,
@@ -36,8 +37,8 @@ const actions = {
           })
       })
       .catch(error => {
-        commit('setLoading', false)
-        commit('setError', error)
+        commit(alert.SET_LOADING, false)
+        commit(alert.SET_ERROR, error)
       })
   },
   getFilteredArticles ({ commit, state, dispatch }, page) {
@@ -52,29 +53,29 @@ const actions = {
     commit(types.SET_TOTAL_PAGES, Math.ceil(totalPages))
   },
   postArticle ({ commit, dispatch }, { article }) {
-    commit('setLoading', true)
+    commit(alert.SET_LOADING, true)
     return articlesApi.postArticle(article)
       .then(article => {
-        commit('setLoading', false)
+        commit(alert.SET_LOADING, false)
         // dispatch('resetEditedArticle', article)
         return article
       })
       .catch(error => {
-        commit('setLoading', false)
-        commit('setError', error)
+        commit(alert.SET_LOADING, false)
+        commit(alert.SET_ERROR, error)
       })
   },
   editArticle ({ commit, dispatch }, { editedArticle }) {
-    commit('setLoading', true)
+    commit(alert.SET_LOADING, true)
     return articlesApi.editArticle(editedArticle)
       .then(editedArticle => {
-        commit('setLoading', false)
+        commit(alert.SET_LOADING, false)
         dispatch('newEditedArticle', editedArticle.data)
         return editedArticle
       })
       .catch(error => {
-        commit('setLoading', false)
-        commit('setError', error)
+        commit(alert.SET_LOADING, false)
+        commit(alert.SET_ERROR, error)
       })
   },
   newEditedArticle ({ commit, dispatch }, payload) {
@@ -87,14 +88,14 @@ const actions = {
       })
   },
   deleteArticle ({ commit }, { id }) {
-    commit('setLoading', true)
+    commit(alert.SET_LOADING, true)
     return articlesApi.deleteArticle({ id })
       .then(() => {
-        commit('setLoading', false)
+        commit(alert.SET_LOADING, false)
       })
       .catch(error => {
-        commit('setLoading', false)
-        commit('setError', error)
+        commit(alert.SET_LOADING, false)
+        commit(alert.SET_ERROR, error)
       })
   },
   getComments (context, { id }) {
@@ -112,32 +113,32 @@ const actions = {
     })
   },
   postComment ({ commit }, payload) {
-    commit('setLoading', true)
+    commit(alert.SET_LOADING, true)
     let newComment = payload
     let dataComment = newComment.commentData
     return commentsApi.postComment({ id: newComment.id }, dataComment)
       .then(commentData => {
-        commit('setLoading', false)
+        commit(alert.SET_LOADING, false)
         return commentData
       })
       .catch(error => {
-        commit('setLoading', false)
-        commit('setError', error)
+        commit(alert.SET_LOADING, false)
+        commit(alert.SET_ERROR, error)
       })
   },
   editComment ({ commit, dispatch }, payload) {
-    commit('setLoading', true)
+    commit(alert.SET_LOADING, true)
     let newEditedComment = payload
     let dataEditedComment = newEditedComment.editedComment
     return commentsApi.editComment({ id: newEditedComment.id }, dataEditedComment)
       .then(() => {
-        commit('setLoading', false)
+        commit(alert.SET_LOADING, false)
         // dispatch('fetchEditedComment', newEditedComment)
         return newEditedComment
       })
       .catch(error => {
-        commit('setLoading', false)
-        commit('setError', error)
+        commit(alert.SET_LOADING, false)
+        commit(alert.SET_ERROR, error)
       })
   },
   fetchEditedComment ({ commit, dispatch }, payload) {
@@ -152,14 +153,14 @@ const actions = {
   deleteComment ({ commit }, payload) {
     let articleId = payload.aid
     let commentId = payload.cid
-    commit('setLoading', true)
+    commit(alert.SET_LOADING, true)
     return commentsApi.deleteComment({ articleId, commentId })
       .then(() => {
-        commit('setLoading', false)
+        commit(alert.SET_LOADING, false)
       })
       .catch(error => {
-        commit('setLoading', false)
-        commit('setError', error)
+        commit(alert.SET_LOADING, false)
+        commit(alert.SET_ERROR, error)
       })
   }
 }
