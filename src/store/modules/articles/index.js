@@ -27,30 +27,24 @@ const getters = {
 }
 
 const actions = {
-  // getAllArticles ({ commit, dispatch }) {
-  //   return articlesApi.getArticles()
-  //     .then(articles => {
-  //       let data = commit(types.RECEIVE_ARTICLES, { articles: articles.data })
-  //       Promise.resolve(data)
-  //         .then(() => {
-  //           dispatch('setPaginationData', articles.data.length)
-  //           dispatch('getFilteredArticles', 1)
-  //         })
-  //     })
-  //     .catch(error => {
-  //       commit(alert.SET_LOADING, false)
-  //       commit(alert.SET_ERROR, error)
-  //     })
-  // },
   getAllArticles({ commit, dispatch }) {
     firebase.database().ref('articles').once('value')
       .then((articles) => {
-        let data = commit(types.RECEIVE_ARTICLES, { articles: articles.data })
-        Promise.resolve(data)
+        const articlesCollection = []
+        const obj = articles.val()
+        for (let key in obj) {
+          articlesCollection.push({
+            id: key,
+            title: obj[key].title,
+            body: obj[key].body
+          })
+        }
+        commit(types.RECEIVE_ARTICLES, { articles: articlesCollection })
+        Promise.resolve(state.articles)
           .then(() => {
-             dispatch('setPaginationData', articles.data.length)
-             dispatch('getFilteredArticles', 1)
-           })
+            dispatch('setPaginationData', articles.length)
+            dispatch('getFilteredArticles', 1)
+          })
       })
       .catch(error => {
         commit(alert.SET_LOADING, false)
@@ -59,7 +53,9 @@ const actions = {
   },
 
   getFilteredArticles ({ commit, state, dispatch }, page) {
+    console.log(state.articles)
     let allArticles = state.articles.map(article => article)
+    console.log('allArticles: ', allArticles)
     let articles = allArticles.splice((page - 1) * 10, 10)
     dispatch('setArticleComments', articles)
     commit(types.SET_CURRENT_PAGE, page)

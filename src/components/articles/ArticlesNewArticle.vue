@@ -93,10 +93,14 @@ export default {
     ]),
     onPostArticle() {
       const newArticleData = {
+        // id: this.userInfo.uid,
         title: this.newArticle.title,
-        body: this.newArticle.body
+        body: this.newArticle.body,
+        // posterEmail: this.userInfo.email,
+        datetime: new Date()
       }
       this.$store.dispatch('postArticle', newArticleData)
+      this.$router.push({ name: 'articles' })
     },
     createNewArticle () {
       this.postArticle({ article: {
