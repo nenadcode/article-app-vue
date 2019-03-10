@@ -17,14 +17,14 @@
           </v-list-tile-action>
           <v-list-tile-content>{{ item.title }}</v-list-tile-content>
         </v-list-tile>
-        <v-list-tile
+        <!-- <v-list-tile
           v-if="loggedIn"
           @click="logout">
           <v-list-tile-action>
             <v-icon>work_off</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>Logout</v-list-tile-content>
-        </v-list-tile>
+        </v-list-tile> -->
       </v-list>
     </v-navigation-drawer>
 
@@ -53,7 +53,6 @@
         </v-btn>
 
         <v-btn
-          v-if="loggedIn"
           @click="logout"
           flat>
           <v-icon left>work_off</v-icon>
@@ -69,7 +68,6 @@ import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'Header',
-  props: ['token'],
   data () {
     return {
       sideNav: false
@@ -88,21 +86,21 @@ export default {
     ...mapGetters([
       'userInfo'
     ]),
-    loggedIn () {
-      return this.$store.getters.userInfo !== null &&   this.$store.getters.userInfo !== undefined &&
-      this.$store.getters.userInfo.id !== undefined
-    },
+    // loggedIn () {
+    //   return this.$store.getters.userInfo !== null &&   this.$store.getters.userInfo !== undefined &&
+    //   this.$store.getters.userInfo.id !== undefined
+    // },
     menuItems () {
-      let menuItems = [
-        { icon: 'person', title: 'Log In', link: '/login' },
-        { icon: 'person_add', title: 'Register', link: '/register' }
-      ]
-      if (this.loggedIn) {
-        menuItems = [
+      // let menuItems = [
+      //   { icon: 'person', title: 'Log In', link: '/login' },
+      //   { icon: 'person_add', title: 'Register', link: '/register' }
+      // ]
+      // if (this.loggedIn) {
+        let menuItems = [
           { icon: 'note_add', title: 'New Article', link: '/new-article' },
           { icon: 'account_box', title: 'Account', link: '/account' }
         ]
-      }
+      // }
       return menuItems
     }
   }
