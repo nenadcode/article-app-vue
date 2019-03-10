@@ -1,5 +1,6 @@
 import articlesApi from '../../../api/articles'
 import commentsApi from '../../../api/comments'
+import * as firebase from 'firebase'
 import * as types from './mutation-types'
 import * as alert from '../alert/mutation-types'
 
@@ -26,21 +27,37 @@ const getters = {
 }
 
 const actions = {
-  getAllArticles ({ commit, dispatch }) {
-    return articlesApi.getArticles()
-      .then(articles => {
+  // getAllArticles ({ commit, dispatch }) {
+  //   return articlesApi.getArticles()
+  //     .then(articles => {
+  //       let data = commit(types.RECEIVE_ARTICLES, { articles: articles.data })
+  //       Promise.resolve(data)
+  //         .then(() => {
+  //           dispatch('setPaginationData', articles.data.length)
+  //           dispatch('getFilteredArticles', 1)
+  //         })
+  //     })
+  //     .catch(error => {
+  //       commit(alert.SET_LOADING, false)
+  //       commit(alert.SET_ERROR, error)
+  //     })
+  // },
+  getAllArticles({ commit, dispatch }) {
+    firebase.database().ref('articles').once('value')
+      .then((articles) => {
         let data = commit(types.RECEIVE_ARTICLES, { articles: articles.data })
         Promise.resolve(data)
           .then(() => {
-            dispatch('setPaginationData', articles.data.length)
-            dispatch('getFilteredArticles', 1)
-          })
+             dispatch('setPaginationData', articles.data.length)
+             dispatch('getFilteredArticles', 1)
+           })
       })
       .catch(error => {
         commit(alert.SET_LOADING, false)
         commit(alert.SET_ERROR, error)
       })
   },
+
   getFilteredArticles ({ commit, state, dispatch }, page) {
     let allArticles = state.articles.map(article => article)
     let articles = allArticles.splice((page - 1) * 10, 10)
@@ -52,12 +69,16 @@ const actions = {
     let totalPages = page / state.pagination.resultsPerPage
     commit(types.SET_TOTAL_PAGES, Math.ceil(totalPages))
   },
-  postArticle ({ commit, dispatch }, { article }) {
-    commit(alert.SET_LOADING, true)
-    return articlesApi.postArticle(article)
-      .then(article => {
-        commit(alert.SET_LOADING, false)
-        // dispatch('resetEditedArticle', article)
+  postArticle({ commit }, payload) {
+    const article = {
+      // userId: getters.user.id,
+      title: payload.title,
+      body: payload.body
+    }
+    firebase.database().ref('articles').push(article)
+      .then((data) => {
+        console.log(data);
+        commit(types.SET_EDITED_ARTICLE, article)
         return article
       })
       .catch(error => {

@@ -14,7 +14,7 @@
         <v-card class="my-5">
           <v-card-title class="article-title">
             <h2 class="headline">{{ article.title }}</h2>
-            <template v-if="userInfo !== null && article.posterId === userInfo.id">
+            <template v-if="userInfo !== null && article.userId === userInfo.id">
               <v-spacer></v-spacer>
               <app-articles-edit-dialog
                 :article="article"
@@ -74,7 +74,7 @@ export default {
     }
   },
   created () {
-    // this.getAllArticles()
+    this.getAllArticles()
   },
   computed: {
     ...mapGetters([

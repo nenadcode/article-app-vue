@@ -18,7 +18,7 @@
     </v-layout>
     <v-layout align-center justify-center>
       <v-flex xs10 sm6 lg4>
-        <v-form>
+        <v-form @submit.prevent="onPostArticle">
           <v-card>
             <v-toolbar dark color="primary">
               <v-toolbar-title class="headline">Create new article</v-toolbar-title>
@@ -49,8 +49,9 @@
               <v-btn
                 color="primary"
                 required
+                type="submit"
                 :disabled="!formIsValid"
-                @click="createNewArticle">
+                :loading="loading">
                 Create
               </v-btn>
             </v-card-actions>
@@ -88,9 +89,15 @@ export default {
   },
   methods: {
     ...mapActions([
-      'postArticle',
       'getUser'
     ]),
+    onPostArticle() {
+      const newArticleData = {
+        title: this.newArticle.title,
+        body: this.newArticle.body
+      }
+      this.$store.dispatch('postArticle', newArticleData)
+    },
     createNewArticle () {
       this.postArticle({ article: {
         id: this.userInfo.id,

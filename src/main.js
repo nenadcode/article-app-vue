@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import App from './App.vue'
 import * as firebase from 'firebase'
+import axios from 'axios'
+import config from '@/config'
 import router from './router'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
@@ -10,6 +12,8 @@ import en from 'vee-validate/dist/locale/en'
 import AlertCmp from './components/shared/Alert.vue'
 
 Vue.component('app-alert', AlertCmp)
+
+axios.defaults.baseURL = config.api
 
 Vue.config.productionTip = false
 

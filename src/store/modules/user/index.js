@@ -62,19 +62,21 @@ const actions = {
   loginUser({ commit }, payload) {
     commit(alert.SET_LOADING, true)
     commit(alert.CLEAR_ERROR, true)
-    firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
-      .then(user => {
-        commit(alert.SET_LOADING, false)
-        const newUser = {
-          id: user.user.uid,
-          email: user.user.email
-        }
-        commit(types.SET_USER, newUser)
-      })
-      .catch(error => {
-        commit(alert.SET_LOADING, false)
-        commit(alert.SET_ERROR, error)
-        console.log(error)
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+      .then(() => {
+        firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
+          .then(user => {
+            commit(alert.SET_LOADING, false)
+            const newUser = {
+              id: user.user.uid,
+              email: user.user.email
+            }
+            commit(types.SET_USER, newUser)
+          })
+          .catch(error => {
+            commit(alert.SET_LOADING, false)
+            commit(alert.SET_ERROR, error)
+          })
       })
   }
 }

@@ -8,7 +8,7 @@ export default {
 }
 
 function getArticles () {
-  return http.get('api/v1/article')
+  return http.get('articles')
 }
 
 function postArticle (article) {
