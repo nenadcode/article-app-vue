@@ -18,7 +18,6 @@
               <v-spacer></v-spacer>
               <app-articles-edit-dialog
                 :article="article"
-                @new-article="editedArticle"
               />
               <v-btn fab accent small @click="onDeleteArticle(article.id, index)">
                 <v-icon medium>delete_forever</v-icon>
@@ -112,12 +111,6 @@ export default {
       }
       this.getFilteredArticles(page)
     },
-    editedArticle (data) {
-      this.editArticle({ editedArticle: data })
-        .catch(err => {
-          this.error = err
-        })
-    },
     onDeleteArticle (id, index) {
       this.deleteArticle({ id })
       this.filteredArticlesData.splice(index, 1)
@@ -143,7 +136,7 @@ export default {
   },
   watch: {
     'filteredArticles' (filteredArticles) {
-      this.filteredArticlesData = filteredArticles.slice().reverse()
+      this.filteredArticlesData = this.filteredArticles.slice().reverse()
     }
   },
   components: {

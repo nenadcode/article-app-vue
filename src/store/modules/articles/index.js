@@ -93,6 +93,10 @@ const actions = {
         commit(alert.SET_LOADING, false)
         commit(types.SET_EDITED_ARTICLE, payload)
       })
+      .catch(error => {
+        commit(alert.SET_LOADING, false)
+        commit(alert.SET_ERROR, error)
+      })
   },
   newEditedArticle ({ commit, dispatch }, payload) {
     let newArticle = payload
@@ -103,13 +107,25 @@ const actions = {
         commit(types.SET_EDITED_ARTICLE, newArticle)
       })
   },
-  deleteArticle ({ commit }, { id }) {
+  deleteArticle({ commit }, { id }) {
     commit(alert.SET_LOADING, true)
-    return articlesApi.deleteArticle({ id })
+    firebase.database().ref('articles').child(id).remove()
       .then(() => {
         commit(alert.SET_LOADING, false)
       })
       .catch(error => {
+        commit(alert.SET_LOADING, false)
+        commit(alert.SET_ERROR, error)
+      })
+  },
+  deleteArticle ({ commit }, payload) {
+    commit(alert.SET_LOADING, true)
+    firebase.database().ref('articles').child(payload.id).remove()
+      .then(() => {
+        commit(alert.SET_LOADING, false)
+      })
+      .catch(error => {
+        console.log(error)
         commit(alert.SET_LOADING, false)
         commit(alert.SET_ERROR, error)
       })
