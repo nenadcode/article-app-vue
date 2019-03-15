@@ -53,9 +53,7 @@ const actions = {
   },
 
   getFilteredArticles ({ commit, state, dispatch }, page) {
-    console.log(state.articles)
     let allArticles = state.articles.map(article => article)
-    console.log('allArticles: ', allArticles)
     let articles = allArticles.splice((page - 1) * 10, 10)
     dispatch('setArticleComments', articles)
     commit(types.SET_CURRENT_PAGE, page)
@@ -67,13 +65,11 @@ const actions = {
   },
   postArticle({ commit }, payload) {
     const article = {
-      // userId: getters.user.id,
       title: payload.title,
       body: payload.body
     }
     firebase.database().ref('articles').push(article)
-      .then((data) => {
-        console.log(data);
+      .then(() => {
         commit(types.SET_EDITED_ARTICLE, article)
         return article
       })
@@ -82,17 +78,20 @@ const actions = {
         commit(alert.SET_ERROR, error)
       })
   },
-  editArticle ({ commit, dispatch }, { editedArticle }) {
+  editArticle ({ commit }, payload) {
     commit(alert.SET_LOADING, true)
-    return articlesApi.editArticle(editedArticle)
-      .then(editedArticle => {
+    console.log(payload)
+    const updatedArticle = {}
+    if (payload.title) {
+      updatedArticle.title = payload.title
+    }
+    if (payload.body) {
+      updatedArticle.body = payload.body
+    }
+    firebase.database().ref('articles').child(payload.id).update(updatedArticle)
+      .then(() => {
         commit(alert.SET_LOADING, false)
-        dispatch('newEditedArticle', editedArticle.data)
-        return editedArticle
-      })
-      .catch(error => {
-        commit(alert.SET_LOADING, false)
-        commit(alert.SET_ERROR, error)
+        commit(types.SET_EDITED_ARTICLE, payload)
       })
   },
   newEditedArticle ({ commit, dispatch }, payload) {
@@ -198,14 +197,16 @@ const mutations = {
   [types.SET_RESULTS_PER_PAGE] (state, page) {
     state.pagination.resultsPerPage = page
   },
-  [types.SET_EDITED_ARTICLE] (state, newArticle) {
-    let articles = state.filteredArticles.map(article => {
-      if (article.id === newArticle.id) {
-        article = newArticle
-      }
-      return article
+  [types.SET_EDITED_ARTICLE] (state, payload) {
+    const article = state.filteredArticles.find(article => {
+      return article.id === payload.id
     })
-    state.filteredArticles = articles
+    if (payload.title) {
+      article.title = payload.title
+    }
+    if (payload.body) {
+      article.body = payload.body
+    }
   },
   [types.SET_COMMENT] (state, { id, comment }) {
     let comments = state.filteredArticles.map(article => {

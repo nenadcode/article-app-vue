@@ -13,8 +13,8 @@
       <div v-for="(article, index) in filteredArticlesData" :key="index">
         <v-card class="my-5">
           <v-card-title class="article-title">
-            <h2 class="headline">{{ article.title  }}</h2>
-            <template v-if="userInfo !== null && article.userId === userInfo.id">
+            <h2 class="headline">{{ article.title }}</h2>
+            <template>
               <v-spacer></v-spacer>
               <app-articles-edit-dialog
                 :article="article"

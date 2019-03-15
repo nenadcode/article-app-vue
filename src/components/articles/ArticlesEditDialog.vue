@@ -62,6 +62,7 @@ export default {
     return {
       editedTitle: this.article.title,
       editedBody: this.article.body,
+      editedId: this.article.id,
       editDialog: false
     }
   },
@@ -77,7 +78,6 @@ export default {
   },
   methods: {
     ...mapActions([
-      'editArticle',
       'getUser',
       'getAllArticles'
     ]),
@@ -85,17 +85,11 @@ export default {
       if (this.editedTitle.trim() === '' || this.editedBody.trim() === '') {
         return
       }
-      let data = {
+      this.$store.dispatch('editArticle', {
         id: this.article.id,
-        posterFirstName: this.article.posterFirstName,
-        posterLastName: this.article.posterLastName,
-        posterEmail: this.article.posterEmail,
-        posterId: this.article.posterId,
         title: this.editedTitle,
-        body: this.editedBody,
-        datetime: new Date()
-      }
-      this.$emit('new-article', data)
+        body: this.editedBody
+      })
     }
   },
   watch: {

@@ -113,7 +113,7 @@ export default {
         body: this.newArticle.body,
         datetime: new Date()
       }})
-        .then(article => {
+        .then(() => {
           this.$router.push({ name: 'articles' })
         })
         .catch(err => {
