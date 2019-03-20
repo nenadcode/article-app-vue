@@ -14,10 +14,23 @@ const getters = {
 }
 
 const actions = {
-  getUser ({ commit }) {
+  // getUser ({ commit }) {
+  //   commit(alert.SET_LOADING, true)
+  //   return userApi.getUserAccount()
+  //     .then(user => {
+  //       commit(alert.SET_LOADING, false)
+  //       commit(types.RECEIVE_USER_ACCOUNT, { user: user.data })
+  //     })
+  //     .catch((error) => {
+  //       commit(alert.SET_LOADING, false)
+  //       commit(alert.SET_ERROR, error)
+  //     })
+  // },
+  getUser({ commit, getters }) {
     commit(alert.SET_LOADING, true)
-    return userApi.getUserAccount()
+    firebase.database().ref('/users/' + getters.userInfo.id + '/registrations/').once('value')
       .then(user => {
+        console.log('get user: ', user)
         commit(alert.SET_LOADING, false)
         commit(types.RECEIVE_USER_ACCOUNT, { user: user.data })
       })
@@ -42,6 +55,7 @@ const actions = {
     commit(types.CHANGE_USER_ACCOUNT, changed)
   },
   resetUserInfo ({ commit }) {
+    firebase.auth().signOut()
     commit(types.RESET_USER_INFO)
   },
   registerUser ({ commit }, payload ) {
@@ -76,6 +90,12 @@ const actions = {
         commit(alert.SET_ERROR, error)
         console.log(error)
       })
+  },
+  autoSignIn({ commit }, payload) {
+    commit(types.SET_USER, {
+      id: payload.uid,
+      email: payload.email
+    })
   }
 }
 

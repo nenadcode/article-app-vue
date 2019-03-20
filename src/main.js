@@ -1,8 +1,8 @@
 import Vue from 'vue'
+import Vuetify from 'vuetify'
 import App from './App.vue'
 import * as firebase from 'firebase'
 import router from './router'
-import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 import { store } from './store/index.js'
 import VeeValidate, { Validator } from 'vee-validate'
@@ -55,6 +55,12 @@ new Vue({
       databaseURL: 'https://article-app-277f2.firebaseio.com',
       projectId: 'article-app-277f2',
       storageBucket: 'article-app-277f2.appspot.com'
+    })
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.$store.dispatch('autoSignIn', user)
+        // this.$store.dispatch('getUser')
+      }
     })
   }
 }).$mount('#app')

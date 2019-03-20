@@ -83,10 +83,7 @@ export default {
       'allComments',
       'pagination',
       'loading'
-    ]),
-    loggedIn () {
-      return !!this.token
-    }
+    ])
   },
   methods: {
     ...mapActions([

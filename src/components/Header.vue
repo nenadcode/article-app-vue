@@ -69,7 +69,6 @@ import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'Header',
-  props: ['token'],
   data () {
     return {
       sideNav: false
@@ -81,7 +80,7 @@ export default {
     ]),
     logout () {
       this.resetUserInfo()
-      this.$router.push({ name: 'login' })
+      this.$router.replace('login')
     }
   },
   computed: {
@@ -89,8 +88,7 @@ export default {
       'userInfo'
     ]),
     loggedIn () {
-      return this.$store.getters.userInfo !== null &&   this.$store.getters.userInfo !== undefined &&
-      this.$store.getters.userInfo.id !== undefined
+      return this.$store.getters.userInfo !== null && this.$store.getters.userInfo !== undefined
     },
     menuItems () {
       let menuItems = [
