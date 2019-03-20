@@ -14,11 +14,10 @@
         <v-card class="my-5">
           <v-card-title class="article-title">
             <h2 class="headline">{{ article.title }}</h2>
-            <template v-if="userInfo !== null && article.posterId === userInfo.id">
+            <template>
               <v-spacer></v-spacer>
               <app-articles-edit-dialog
                 :article="article"
-                @new-article="editedArticle"
               />
               <v-btn fab accent small @click="onDeleteArticle(article.id, index)">
                 <v-icon medium>delete_forever</v-icon>
@@ -74,7 +73,7 @@ export default {
     }
   },
   created () {
-    // this.getAllArticles()
+    this.getAllArticles()
   },
   computed: {
     ...mapGetters([
@@ -109,12 +108,6 @@ export default {
       }
       this.getFilteredArticles(page)
     },
-    editedArticle (data) {
-      this.editArticle({ editedArticle: data })
-        .catch(err => {
-          this.error = err
-        })
-    },
     onDeleteArticle (id, index) {
       this.deleteArticle({ id })
       this.filteredArticlesData.splice(index, 1)
@@ -140,7 +133,7 @@ export default {
   },
   watch: {
     'filteredArticles' (filteredArticles) {
-      this.filteredArticlesData = filteredArticles
+      this.filteredArticlesData = this.filteredArticles.slice().reverse()
     }
   },
   components: {

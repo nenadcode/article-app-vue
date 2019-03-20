@@ -1,5 +1,5 @@
-import articlesApi from '../../../api/articles'
 import commentsApi from '../../../api/comments'
+import * as firebase from 'firebase'
 import * as types from './mutation-types'
 import * as alert from '../alert/mutation-types'
 
@@ -26,13 +26,22 @@ const getters = {
 }
 
 const actions = {
-  getAllArticles ({ commit, dispatch }) {
-    return articlesApi.getArticles()
-      .then(articles => {
-        let data = commit(types.RECEIVE_ARTICLES, { articles: articles.data })
-        Promise.resolve(data)
+  getAllArticles({ commit, dispatch }) {
+    firebase.database().ref('articles').once('value')
+      .then((articles) => {
+        const articlesCollection = []
+        const obj = articles.val()
+        for (let key in obj) {
+          articlesCollection.push({
+            id: key,
+            title: obj[key].title,
+            body: obj[key].body
+          })
+        }
+        commit(types.RECEIVE_ARTICLES, { articles: articlesCollection })
+        Promise.resolve(state.articles)
           .then(() => {
-            dispatch('setPaginationData', articles.data.length)
+            dispatch('setPaginationData', articles.length)
             dispatch('getFilteredArticles', 1)
           })
       })
@@ -41,6 +50,7 @@ const actions = {
         commit(alert.SET_ERROR, error)
       })
   },
+
   getFilteredArticles ({ commit, state, dispatch }, page) {
     let allArticles = state.articles.map(article => article)
     let articles = allArticles.splice((page - 1) * 10, 10)
@@ -52,12 +62,14 @@ const actions = {
     let totalPages = page / state.pagination.resultsPerPage
     commit(types.SET_TOTAL_PAGES, Math.ceil(totalPages))
   },
-  postArticle ({ commit, dispatch }, { article }) {
-    commit(alert.SET_LOADING, true)
-    return articlesApi.postArticle(article)
-      .then(article => {
-        commit(alert.SET_LOADING, false)
-        // dispatch('resetEditedArticle', article)
+  postArticle({ commit }, payload) {
+    const article = {
+      title: payload.title,
+      body: payload.body
+    }
+    firebase.database().ref('articles').push(article)
+      .then(() => {
+        commit(types.SET_EDITED_ARTICLE, article)
         return article
       })
       .catch(error => {
@@ -65,13 +77,20 @@ const actions = {
         commit(alert.SET_ERROR, error)
       })
   },
-  editArticle ({ commit, dispatch }, { editedArticle }) {
+  editArticle ({ commit }, payload) {
     commit(alert.SET_LOADING, true)
-    return articlesApi.editArticle(editedArticle)
-      .then(editedArticle => {
+    console.log(payload)
+    const updatedArticle = {}
+    if (payload.title) {
+      updatedArticle.title = payload.title
+    }
+    if (payload.body) {
+      updatedArticle.body = payload.body
+    }
+    firebase.database().ref('articles').child(payload.id).update(updatedArticle)
+      .then(() => {
         commit(alert.SET_LOADING, false)
-        dispatch('newEditedArticle', editedArticle.data)
-        return editedArticle
+        commit(types.SET_EDITED_ARTICLE, payload)
       })
       .catch(error => {
         commit(alert.SET_LOADING, false)
@@ -87,13 +106,25 @@ const actions = {
         commit(types.SET_EDITED_ARTICLE, newArticle)
       })
   },
-  deleteArticle ({ commit }, { id }) {
+  deleteArticle({ commit }, { id }) {
     commit(alert.SET_LOADING, true)
-    return articlesApi.deleteArticle({ id })
+    firebase.database().ref('articles').child(id).remove()
       .then(() => {
         commit(alert.SET_LOADING, false)
       })
       .catch(error => {
+        commit(alert.SET_LOADING, false)
+        commit(alert.SET_ERROR, error)
+      })
+  },
+  deleteArticle ({ commit }, payload) {
+    commit(alert.SET_LOADING, true)
+    firebase.database().ref('articles').child(payload.id).remove()
+      .then(() => {
+        commit(alert.SET_LOADING, false)
+      })
+      .catch(error => {
+        console.log(error)
         commit(alert.SET_LOADING, false)
         commit(alert.SET_ERROR, error)
       })
@@ -181,14 +212,16 @@ const mutations = {
   [types.SET_RESULTS_PER_PAGE] (state, page) {
     state.pagination.resultsPerPage = page
   },
-  [types.SET_EDITED_ARTICLE] (state, newArticle) {
-    let articles = state.filteredArticles.map(article => {
-      if (article.id === newArticle.id) {
-        article = newArticle
-      }
-      return article
+  [types.SET_EDITED_ARTICLE] (state, payload) {
+    const article = state.filteredArticles.find(article => {
+      return article.id === payload.id
     })
-    state.filteredArticles = articles
+    if (payload.title) {
+      article.title = payload.title
+    }
+    if (payload.body) {
+      article.body = payload.body
+    }
   },
   [types.SET_COMMENT] (state, { id, comment }) {
     let comments = state.filteredArticles.map(article => {

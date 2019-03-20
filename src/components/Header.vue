@@ -53,7 +53,6 @@
         </v-btn>
 
         <v-btn
-          v-if="loggedIn"
           @click="logout"
           flat>
           <v-icon left>work_off</v-icon>
@@ -96,7 +95,7 @@ export default {
         { icon: 'person_add', title: 'Register', link: '/register' }
       ]
       if (this.loggedIn) {
-        menuItems = [
+        let menuItems = [
           { icon: 'note_add', title: 'New Article', link: '/new-article' },
           { icon: 'account_box', title: 'Account', link: '/account' }
         ]
