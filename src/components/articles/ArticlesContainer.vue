@@ -14,7 +14,7 @@
         <v-card class="my-5">
           <v-card-title class="article-title">
             <h2 class="headline">{{ article.title }}</h2>
-            <template>
+            <template v-if="userInfo !== null && article.email === userInfo.email">
               <v-spacer></v-spacer>
               <app-articles-edit-dialog
                 :article="article"

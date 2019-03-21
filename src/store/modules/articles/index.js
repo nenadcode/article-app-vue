@@ -31,13 +31,16 @@ const actions = {
       .then((articles) => {
         const articlesCollection = []
         const obj = articles.val()
+        console.log(obj)
         for (let key in obj) {
           articlesCollection.push({
             id: key,
             title: obj[key].title,
-            body: obj[key].body
+            body: obj[key].body,
+            email: obj[key].email
           })
         }
+        console.log(articlesCollection)
         commit(types.RECEIVE_ARTICLES, { articles: articlesCollection })
         Promise.resolve(state.articles)
           .then(() => {
@@ -65,7 +68,10 @@ const actions = {
   postArticle({ commit }, payload) {
     const article = {
       title: payload.title,
-      body: payload.body
+      body: payload.body,
+      email: payload.posterEmail,
+      id: payload.posterId,
+      datetime: payload.datetime
     }
     firebase.database().ref('articles').push(article)
       .then(() => {
